@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -14,27 +16,51 @@ class DBHelper {
 
   Database? sb;
 
-  initDB() async {
-    String path = await getDatabasesPath();
-    String db = join(path, 'user.db');
+  Future<String> checkPath(String dbName) async {
+    var databasePath = await getDatabasesPath();
+    String path = join(databasePath, dbName);
+    if (await Directory(dirname(path)).exists()) {
+    } else {
+      try {
+        await Directory(dirname(path)).create(recursive: true);
+      } catch (e) {
+        print(e);
+      }
+    }
+    return path;
+  }
 
+  initDB() async {
+    String path = await checkPath('user.db');
     sb = await openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async {
         await db.execute(
-            'CREATE TABLE $tableName ($id INTEGER PRIMARY KEY AUTOINCREMENT, $name TEXT NOTNULL,$mail TEXT NOTNULL, $password TEXT NOTNULL);');
+            'CREATE TABLE $tableName ($id INTEGER PRIMARY KEY AUTOINCREMENT, $name TEXT NOT NULL,$mail TEXT NOT NULL, $password TEXT NOT NULL);');
       },
     );
   }
 
-  Future<Future<int>?> insertValue(
+  Future<int?> insertValue(
       {required String name,
       required String mail,
       required String password}) async {
-    await initDB;
+    initDB;
 
-    return sb?.insert(
-        tableName, {this.name: name, this.password: password, this.mail: mail});
+    if (sb == null) {
+      initDB();
+    }
+    if (name == null && mail == null && password == null) {
+      return sb?.insert(tableName,
+          {this.name: name, this.password: password, this.mail: mail});
+    }
   }
+
+  Future<List<Map<String, Object?>>>? fetchData() {
+    initDB();
+    return sb?.query(tableName);
+  }
+
+
 }

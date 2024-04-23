@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:untitled1/modules/utils/helper/dbhelper.dart';
 import 'package:untitled1/modules/views/signup/view/components/components.dart';
 
@@ -100,49 +101,53 @@ class SignUpView extends StatelessWidget {
                   ),
                   Padding(
                     padding: const EdgeInsets.only(top: 28.0),
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.black,
+                    child: StatefulBuilder(
+                      builder: (context, setState) => FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.black,
+                        ),
+                        onPressed: () async {
+                          res = await DBHelper.instance.insertValue(
+                              name: nameEditor.text,
+                              mail: mailEditor.text,
+                              password: passwordEditor.text);
+
+                          if (res != null) {
+                            mailEditor.clear();
+                            passwordEditor.clear();
+                            nameEditor.clear();
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.black,
+                                //  elevation: 0.6,
+                                shape: UnderlineInputBorder(
+                                  borderRadius: BorderRadius.circular(23),
+                                ),
+                                showCloseIcon: true,
+
+                                content: const Text('process done'),
+                              ),
+                            );
+
+                            Get.offAllNamed("/home");
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.black,
+                                //  elevation: 0.6,
+                                shape: UnderlineInputBorder(
+                                  borderRadius: BorderRadius.circular(23),
+                                ),
+                                showCloseIcon: true,
+
+                                content: const Text('error try again'),
+                              ),
+                            );
+                          }
+                        },
+                        child: const Text("SUBMIT"),
                       ),
-                      onPressed: () async {
-                        res = (await DBHelper.instance.insertValue(
-                            name: nameEditor.text,
-                            mail: mailEditor.text,
-                            password: passwordEditor.text)) as int?;
-
-                        if (res != null) {
-                          mailEditor.clear();
-                          passwordEditor.clear();
-                          nameEditor.clear();
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: Colors.black,
-                              //  elevation: 0.6,
-                              shape: UnderlineInputBorder(
-                                borderRadius: BorderRadius.circular(23),
-                              ),
-                              showCloseIcon: true,
-
-                              content: const Text('process done'),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: Colors.black,
-                              //  elevation: 0.6,
-                              shape: UnderlineInputBorder(
-                                borderRadius: BorderRadius.circular(23),
-                              ),
-                              showCloseIcon: true,
-
-                              content: const Text('error try again'),
-                            ),
-                          );
-                        }
-                      },
-                      child: const Text("SUBMIT"),
                     ),
                   ),
                 ],

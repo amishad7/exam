@@ -1,21 +1,22 @@
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
 class SplashView extends StatelessWidget {
   const SplashView({super.key});
 
-  Timer() {
-    Duration(
-      seconds: 3,
-    );
-    () {
+  toNext() {
+    Future.delayed(const Duration(seconds: 3), () {
       Get.offAndToNamed('/splash2');
-    };
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    toNext();
+
     return Scaffold(
       backgroundColor: Colors.black12,
       body: Stack(
@@ -50,7 +51,12 @@ class SplashView extends StatelessWidget {
               ),
             ),
           ),
-          const CircularProgressIndicator(),
+          const Padding(
+            padding: EdgeInsets.only(top: 565, left: 155),
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
+          ),
         ],
       ),
     );
